@@ -70,7 +70,7 @@ style = "<style>h1 {text-align: center;} h4 {text-align: center;}</style>"
 st.markdown(style, unsafe_allow_html=True)
 st.title("Gen Z Sentence Scorer")
 st.write("### Enter a sentence! We will rate it on how Gen-Z it is:")
-user_sentence = st.text_input("")
+user_sentence = st.text_input("Your sentence:", label_visibility="collapsed")
 
 if user_sentence:
   with st.spinner("Calculating..."):
