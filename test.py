@@ -66,12 +66,17 @@ def process(sentence):
   json_text = json.loads(text)
   return json_text
 
-st.header("Gen Z Sentence Scorer")
-user_sentence = st.text_input(label="Enter a sentence! We will rate it on how Gen-Z it is:")
+style = "<style>h1 {text-align: center;} h4 {text-align: center;}</style>"
+st.markdown(style, unsafe_allow_html=True)
+st.title("Gen Z Sentence Scorer")
+st.write("### Enter a sentence! We will rate it on how Gen-Z it is:")
+user_sentence = st.text_input("")
 
 if user_sentence:
   with st.spinner("Calculating..."):
     result = process(user_sentence)
 
-  st.markdown(f"## Score: {result["score"]}")
-  st.markdown(f"### Explanation: {result["explanation"]}")
+  with st.columns(3)[1]:
+    st.write(f"# :orange[{result['score']}%]")
+  st.write(f"#### {result['explanation']}")
+  
