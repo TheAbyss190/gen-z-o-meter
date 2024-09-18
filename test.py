@@ -66,6 +66,7 @@ def process(sentence):
   json_text = json.loads(text)
   return json_text
 
+st.set_page_config(page_title="")
 style = "<style>h1 {text-align: center;} h4 {text-align: center;}</style>"
 st.markdown(style, unsafe_allow_html=True)
 st.title("Gen Z Sentence Scorer")
