@@ -4,6 +4,10 @@ import google.generativeai as genai
 import json
 import typing_extensions as typing
 import time
+import pygsheets
+import pandas as pd
+from streamlit_gsheets import GSheetsConnection
+
 
 def process(sentence):
   genai.configure(api_key=os.environ["GEMINI_API_KEY"])
@@ -67,17 +71,30 @@ def process(sentence):
   return json_text
 
 st.set_page_config(page_title="")
+conn = st.connection("gsheets", type=GSheetsConnection)
 style = "<style>h1 {text-align: center;} h4 {text-align: center;}</style>"
 st.markdown(style, unsafe_allow_html=True)
 st.title("Gen Z Sentence Scorer")
 st.write("### Enter a sentence! We will rate it on how Gen-Z it is:")
 user_sentence = st.text_input("Your sentence:", label_visibility="collapsed")
 
+c = pygsheets.authorize()
+sheet = c.open_by_key("11KyN-KniIx9s7qlk9ehCN4YQcbny2JyR6T88k8Zg4kY")
+wks = sheet.worksheet("id", "0")
+print(wks.cell("A1"))
+
 if user_sentence:
   with st.spinner("Calculating..."):
     result = process(user_sentence)
 
+  sentence = user_sentence
+  score = result['score']
+  explanation = result['explanation']
   with st.columns(3)[1]:
-    st.write(f"# :orange[{result['score']}%]")
-  st.write(f"#### {result['explanation']}")
+    st.write(f"# :orange[{score}%]")
+  st.write(f"#### {explanation}")
   
+  df = conn.read()
+  df.loc[len(df)] = [sentence, score]
+  
+
