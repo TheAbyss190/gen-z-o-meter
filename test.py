@@ -8,6 +8,7 @@ import time
 import pandas as pd
 # from streamlit_gsheets import GSheetsConnection
 
+SCORE_COLOR_HEX = "#9EB3C2"
 
 def process(sentence):
   genai.configure(api_key=os.environ["GEMINI_API_KEY"])
@@ -91,7 +92,7 @@ if user_sentence:
   score = result['score']
   explanation = result['explanation']
   with st.columns(3)[1]:
-    st.write(f"# :orange[{score}%]")
+    st.write(f"# :{SCORE_COLOR_HEX}[{score}%]")
   st.write(f"#### {explanation}")
   
   # df = conn.read()
