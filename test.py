@@ -4,9 +4,8 @@ import google.generativeai as genai
 import json
 import typing_extensions as typing
 import time
-# import pygsheets
 import pandas as pd
-# from streamlit_gsheets import GSheetsConnection
+from streamlit_gsheets import GSheetsConnection
 
 SCORE_COLOR_HEX = "#9EB3C2"
 
@@ -71,18 +70,14 @@ def process(sentence):
   json_text = json.loads(text)
   return json_text
 
+global df
+df = pd.DataFrame({"Sentence": [], "Score": []})
 st.set_page_config(page_title="")
-# conn = st.connection("gsheets", type=GSheetsConnection)
 style = "<style>h1 {text-align: center;} h4 {text-align: center;}</style>"
 st.markdown(style, unsafe_allow_html=True)
 st.title("Gen Z Sentence Scorer")
 st.write("### Enter a sentence! We will rate it on how Gen-Z it is:")
 user_sentence = st.text_input("Your sentence:", label_visibility="collapsed")
-
-# c = pygsheets.authorize()
-# sheet = c.open_by_key("11KyN-KniIx9s7qlk9ehCN4YQcbny2JyR6T88k8Zg4kY")
-# wks = sheet.worksheet("id", "0")
-# print(wks.cell("A1"))
 
 if user_sentence:
   with st.spinner("Calculating..."):
@@ -94,8 +89,16 @@ if user_sentence:
   with st.columns(3)[1]:
     st.write(f"# :{SCORE_COLOR_HEX}[{score}%]")
   st.write(f"#### {explanation}")
-  
-  # df = conn.read()
-  # df.loc[len(df)] = [sentence, score]
-  
+  updated_df = pd.DataFrame({"Sentence": [user_sentence], "Score": [score]})
+  df = pd.concat([df, updated_df], ignore_index=True)
+
+  conn = st.connection("gsheets", type=GSheetsConnection)
+  read_df = conn.read()
+  df = pd.concat([read_df, df], ignore_index=True)
+  conn.update(data=df)
+
+
+print(df.head())
+
+
 
