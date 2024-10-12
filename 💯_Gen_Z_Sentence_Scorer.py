@@ -6,9 +6,7 @@ import typing_extensions as typing
 import time
 import pandas as pd
 from streamlit_gsheets import GSheetsConnection
-from dotenv import load_dotenv
 
-load_dotenv()
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 def process(sentence):

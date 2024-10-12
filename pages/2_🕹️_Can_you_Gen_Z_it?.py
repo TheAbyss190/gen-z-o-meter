@@ -2,9 +2,6 @@ import streamlit as st
 import os
 import google.generativeai as genai
 import random
-from dotenv import load_dotenv
-
-load_dotenv()
 
 st.set_page_config("Gen-Z-ify", "🕹️")
 st.header("Can you Gen-Z it? 🕹️")

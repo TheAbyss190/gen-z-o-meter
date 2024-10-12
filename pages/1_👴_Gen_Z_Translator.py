@@ -1,9 +1,6 @@
 import streamlit as st
 import os
 import google.generativeai as genai
-from dotenv import load_dotenv
-
-load_dotenv()
 
 st.set_page_config("Gen Z Translator", "👴")
 st.header("Welcome to the Gen Z Translator!")
