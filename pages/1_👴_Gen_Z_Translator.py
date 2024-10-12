@@ -2,12 +2,12 @@ import streamlit as st
 import os
 import google.generativeai as genai
 
-st.set_page_config("Game 2", "👴")
-st.header("This is game 2!")
+st.set_page_config("Gen Z Translator", "👴")
+st.header("Welcome to the Gen Z Translator!")
+
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 def process(sentence):
-
-    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
     # Create the model
     generation_config = {
@@ -47,12 +47,14 @@ def process(sentence):
         return response.text
     except Exception as e:
         st.error(e)
+        return False
 
 input_sentence = st.text_input("Enter a Gen Z sentence:")
 
 if input_sentence:
     response = process(input_sentence)
 
-    st.write(f"{response}")
+    if response:
+        st.write(f"{response}")
 
 

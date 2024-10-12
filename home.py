@@ -7,11 +7,9 @@ import time
 import pandas as pd
 from streamlit_gsheets import GSheetsConnection
 
-SCORE_COLOR_HEX = "#9EB3C2"
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 def process(sentence):
-  genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-
   class Sentence(typing.TypedDict):
     score: int
     explanation: str
@@ -36,39 +34,42 @@ def process(sentence):
     # See https://ai.google.dev/gemini-api/docs/safety-settings
   )
 
-  response = model.generate_content([
-    "Examples:",
-    "input: watched barbie last night, 😳 margot robbie really ate that role 🔥",
-    "output1: 95.5",
-    "output2: The sentence includes two cultural references - the 2023 movie Barbie and actress Margot Robbie. It also uses two emojis. It also uses a Gen Z slang word - \"ate\".",
-    "input: had a nice and quiet day, everything was peaceful 🌸",
-    "output1: 23.8",
-    "output2: As the tone of this sentence is not very similar to Gen-Z sentences, the score is on the lower end. However, it does look like a messaging app-text, and uses an emoji, thus the score.",
-    "input: The weather today is pleasant, and I look forward to a productive day at work.",
-    "output1: 0.5",
-    "output2: The sentence uses correct, formal grammatical structure. The subject of the sentence is not very reminiscent of Gen-Z and it does not use any emojis, it does not use any Gen-Z lingo, and does not include any cultural references.",
-    "input: omg, just saw the cutest puppy 🐶",
-    "output1: 79.2",
-    "output2: The use of the emoji, and the lack of capital letters lends itself to the style of Gen-Z sentences. The use of \"omg\" also indicates a use of a slang word. The tone is also casual and informal However, it does not include too many slang terms, it does not include cultural references, there is also only a single emoji, hence a score that is not extremely high.",
-    "input: omg you totally ate that look 👏, slay queen",
-    "output1: 95",
-    "output2: This sentence is extremely Gen-Z in nature. It makes use of three slang words - \"ate\", \"slay\", and \"queen\", uses informal language and grammar (lack of punctuation, lack of capital letters), and is similar to a message on a social media app.",
-    "input: bruh, you seriously ghosted me? 😳 smh 🤦‍♂️",
-    "output1: 98.5",
-    "output2: The sentence uses Gen-Z slang words - \"bruh\" and \"ghosted\". It uses three emojis, and is informal in its structure, as well as its tone. It is also very similar to a message one might find on a social media app, and the subject of the sentence is very Gen-Z in nature. Hence the high score.",
-    "input: the day went by without any major issues or concerns 👍",
-    "output1: 10.2",
-    "output2: The sentence does use an emoji. However, that is the only aspect of the sentence that is remotely Gen-Z in nature. The sentence is grammatically correct and formal in nature, and its meaning is not very representative of Gen-Z. Thus, the score is extremely low.",
-    "New:",
-    f"input: {sentence}",
-    "output1: ",
-    "output2: "
-  ])
+  try:
+    response = model.generate_content([
+      "Examples:",
+      "input: watched barbie last night, 😳 margot robbie really ate that role 🔥",
+      "output1: 95.5",
+      "output2: The sentence includes two cultural references - the 2023 movie Barbie and actress Margot Robbie. It also uses two emojis. It also uses a Gen Z slang word - \"ate\".",
+      "input: had a nice and quiet day, everything was peaceful 🌸",
+      "output1: 23.8",
+      "output2: As the tone of this sentence is not very similar to Gen-Z sentences, the score is on the lower end. However, it does look like a messaging app-text, and uses an emoji, thus the score.",
+      "input: The weather today is pleasant, and I look forward to a productive day at work.",
+      "output1: 0.5",
+      "output2: The sentence uses correct, formal grammatical structure. The subject of the sentence is not very reminiscent of Gen-Z and it does not use any emojis, it does not use any Gen-Z lingo, and does not include any cultural references.",
+      "input: omg, just saw the cutest puppy 🐶",
+      "output1: 79.2",
+      "output2: The use of the emoji, and the lack of capital letters lends itself to the style of Gen-Z sentences. The use of \"omg\" also indicates a use of a slang word. The tone is also casual and informal However, it does not include too many slang terms, it does not include cultural references, there is also only a single emoji, hence a score that is not extremely high.",
+      "input: omg you totally ate that look 👏, slay queen",
+      "output1: 95",
+      "output2: This sentence is extremely Gen-Z in nature. It makes use of three slang words - \"ate\", \"slay\", and \"queen\", uses informal language and grammar (lack of punctuation, lack of capital letters), and is similar to a message on a social media app.",
+      "input: bruh, you seriously ghosted me? 😳 smh 🤦‍♂️",
+      "output1: 98.5",
+      "output2: The sentence uses Gen-Z slang words - \"bruh\" and \"ghosted\". It uses three emojis, and is informal in its structure, as well as its tone. It is also very similar to a message one might find on a social media app, and the subject of the sentence is very Gen-Z in nature. Hence the high score.",
+      "input: the day went by without any major issues or concerns 👍",
+      "output1: 10.2",
+      "output2: The sentence does use an emoji. However, that is the only aspect of the sentence that is remotely Gen-Z in nature. The sentence is grammatically correct and formal in nature, and its meaning is not very representative of Gen-Z. Thus, the score is extremely low.",
+      "New:",
+      f"input: {sentence}",
+      "output1: ",
+      "output2: "
+    ])
 
-  text = response.text
-  print(text)
-  json_text = json.loads(text)
-  return json_text
+    text = response.text
+    print(text)
+    json_text = json.loads(text)
+    return json_text
+  except Exception as e:
+    st.error(e)
 
 global df
 df = pd.DataFrame({"Sentence": [], "Score": []})
@@ -87,7 +88,7 @@ if user_sentence:
   score = result['score']
   explanation = result['explanation']
   with st.columns(3)[1]:
-    st.write(f"# :{SCORE_COLOR_HEX}[{score}%]")
+    st.write(f'<p style="color:#9EB3C2; font-size:45px; text-align:center; font-weight:bold">{score}%</p>', unsafe_allow_html=True)
   st.write(f"#### {explanation}")
   updated_df = pd.DataFrame({"Sentence": [user_sentence], "Score": [score]})
   df = pd.concat([df, updated_df], ignore_index=True)
